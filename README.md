@@ -54,113 +54,100 @@ what we did :
 
 we implemented edf (earliest deadline first sheduling algorithm) to customise sheduling for our RTOS 
 
-FreeRTOS Task Monitoring GUI (Windows Simulator)
+1. Task Scheduling (EDF + Priority)
+Concept:
+The scheduler combines Earliest Deadline First (EDF) and priority-based scheduling.
 
-This project integrates a real-time Task Monitoring GUI using LVGL (Light and Versatile Graphics Library) into the FreeRTOS Windows Simulator. It visualizes FreeRTOS task data such as CPU usage, stack remaining, and task states on a simulated GUI using SDL2.
+Implementation:
 
+Each task has a deadline and a priority.
 
----
+In edfPriorityScheduler():
 
-Features
+It builds a readyQueue of tasks whose arrivalTime <= currentTime and are not yet completed.
 
-Real-time visualization of FreeRTOS task metrics
+Sorts this queue:
 
-Displays:
+First by priority (lower is better),
 
-Task name
+Then by deadline (earlier deadline has higher urgency).
 
-CPU usage %
+It selects the front of the queue to run.
 
-Remaining stack space
+This task executes for one time unit (remainingTime--), and if done, it's marked completed.
 
+2. IPC Queue (Indirect)
+Concept:
+The vector taskList acts like an IPC queue. Multiple threads access it:
 
-Refreshes every 1 second
+simulateTaskInput() adds tasks (simulated user input).
 
-Built on LVGL with SDL2 for Windows GUI simulation
+edfPriorityScheduler() reads and updates the task list.
 
+Synchronization:
+It uses std::mutex (mtx) to ensure thread-safe access. The lock_guard ensures:
 
+No race conditions,
 
----
+Safe concurrent task addition and scheduling.
 
-Directory Structure
+3. IPC via Shared Memory (Simulated)
+Concept:
+shared_memory is a shared variable that simulates memory-mapped IPC.
 
-FreeRTOS/
-├── Demo/
-│   └── WIN32-MSVC/
-│       ├── main.c
-│       ├── task_monitor.c
-│       ├── task_monitor.h
-│       ├── task_monitor_gui.c
-│       ├── lvgl_init_task.c
-│       └── ...
-├── lvgl/ (submodule)
-├── lv_drivers/ (cloned)
-└── FreeRTOS-Kernel/
+Usage:
 
+The running task sets shared_memory = task.id.
 
----
+If no task is running, it sets shared_memory = -1.
 
-Setup Instructions
+This shared variable represents which task is being processed, visible globally (to other threads or systems, if expanded).
 
-1.⁠ ⁠Clone Repositories
+4. GUI with ncurses (Detailed)
+Concept:
+ncurses is a C/C++ terminal GUI library. It lets you build interactive CLI programs with windows, colors, input fields, etc.
 
-git clone https://github.com/FreeRTOS/FreeRTOS.git
-cd FreeRTOS
-git submodule add https://github.com/lvgl/lvgl.git
-git clone https://github.com/lvgl/lv_drivers.git
+Used Windows:
 
+win – the main display window for showing tasks, time, and shared memory.
 
----
+Temporary popup windows for task input.
 
-2.⁠ ⁠Enable Task Monitoring
+Key GUI Elements:
 
-Edit FreeRTOSConfig.h in FreeRTOS/Demo/WIN32-MSVC/:
+Element	Purpose
+box(win, 0, 0)	Draws a border around the window.
+mvwprintw(win, y, x, ...)	Prints text at a specific position inside the window.
+werase(win)	Clears the content of the window.
+wrefresh(win)	Updates the actual terminal with the changes.
+mvvgetnstr()	Reads user input from specific location.
+curs_set(0/1)	Hides/shows the cursor.
+'i' key	Opens an input window for dynamic task addition.
+'q' key	Exits the program.
+Display Features:
 
-#define configUSE_TRACE_FACILITY              1
-#define configGENERATE_RUN_TIME_STATS         1
-#define configUSE_STATS_FORMATTING_FUNCTIONS  1
-#define configUSE_IDLE_HOOK                   1
+Header: Current time, running task, shared memory.
 
+Task Table: With ID, arrival time, execution time, remaining time, deadline, priority, and status (Pending, Running, Done).
 
----
+Dynamic UI: Updated every second with task progress.
 
-3.⁠ ⁠Add Required Files
+Popup for Input: Prompts user to add a task interactively.
 
-Place the following files in WIN32-MSVC/:
+Example Snippet:
 
-task_monitor.c / task_monitor.h: Collects task stats
+cpp
+Copy
+Edit
+mvwprintw(win, 1, 2, "EDF + Priority Scheduler | Time: %d", currentTime);
+mvwprintw(win, 3, 2, "Shared Memory (Task ID): %d", shared_memory);
+5. Summary of Features
+Manual + Auto Task Input: Combine user control with real-time simulation.
 
-lvgl_init_task.c: Initializes LVGL and SDL display
+Preemptive Simulation: Tasks run 1-second ticks, mimicking real CPUs.
 
-task_monitor_gui.c: Draws the GUI
+Interactive Dashboard: Terminal-based real-time monitor.
 
-Update main.c: Starts monitoring and GUI tasks
+Shared IPC Display: Simulated memory visualization.
 
-
-
----
-
-4.⁠ ⁠SDL2 Setup (Required for LVGL GUI on Windows)
-
-Download SDL2 development libraries from SDL.org
-
-Add SDL2 include path and .lib files to your Visual Studio project
-
-Copy SDL2 dll to your build directory
-
-
-
----
-
-5.⁠ ⁠Build and Run
-
-Open the FreeRTOS.sln (or your MSVC project) and:
-
-Include lvgl, lv_drivers, and the new source files in the project
-
-Build the solution
-
-Run the executable
-
-
-A window should appear showing task information updating every second.
+Scalable: Easy to extend with I/O, semaphores, or real memory mapping.
