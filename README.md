@@ -54,3 +54,113 @@ what we did :
 
 we implemented edf (earliest deadline first sheduling algorithm) to customise sheduling for our RTOS 
 
+FreeRTOS Task Monitoring GUI (Windows Simulator)
+
+This project integrates a real-time Task Monitoring GUI using LVGL (Light and Versatile Graphics Library) into the FreeRTOS Windows Simulator. It visualizes FreeRTOS task data such as CPU usage, stack remaining, and task states on a simulated GUI using SDL2.
+
+
+---
+
+Features
+
+Real-time visualization of FreeRTOS task metrics
+
+Displays:
+
+Task name
+
+CPU usage %
+
+Remaining stack space
+
+
+Refreshes every 1 second
+
+Built on LVGL with SDL2 for Windows GUI simulation
+
+
+
+---
+
+Directory Structure
+
+FreeRTOS/
+├── Demo/
+│   └── WIN32-MSVC/
+│       ├── main.c
+│       ├── task_monitor.c
+│       ├── task_monitor.h
+│       ├── task_monitor_gui.c
+│       ├── lvgl_init_task.c
+│       └── ...
+├── lvgl/ (submodule)
+├── lv_drivers/ (cloned)
+└── FreeRTOS-Kernel/
+
+
+---
+
+Setup Instructions
+
+1.⁠ ⁠Clone Repositories
+
+git clone https://github.com/FreeRTOS/FreeRTOS.git
+cd FreeRTOS
+git submodule add https://github.com/lvgl/lvgl.git
+git clone https://github.com/lvgl/lv_drivers.git
+
+
+---
+
+2.⁠ ⁠Enable Task Monitoring
+
+Edit FreeRTOSConfig.h in FreeRTOS/Demo/WIN32-MSVC/:
+
+#define configUSE_TRACE_FACILITY              1
+#define configGENERATE_RUN_TIME_STATS         1
+#define configUSE_STATS_FORMATTING_FUNCTIONS  1
+#define configUSE_IDLE_HOOK                   1
+
+
+---
+
+3.⁠ ⁠Add Required Files
+
+Place the following files in WIN32-MSVC/:
+
+task_monitor.c / task_monitor.h: Collects task stats
+
+lvgl_init_task.c: Initializes LVGL and SDL display
+
+task_monitor_gui.c: Draws the GUI
+
+Update main.c: Starts monitoring and GUI tasks
+
+
+
+---
+
+4.⁠ ⁠SDL2 Setup (Required for LVGL GUI on Windows)
+
+Download SDL2 development libraries from SDL.org
+
+Add SDL2 include path and .lib files to your Visual Studio project
+
+Copy SDL2 dll to your build directory
+
+
+
+---
+
+5.⁠ ⁠Build and Run
+
+Open the FreeRTOS.sln (or your MSVC project) and:
+
+Include lvgl, lv_drivers, and the new source files in the project
+
+Build the solution
+
+Run the executable
+
+
+A window should appear showing task information updating every second.
