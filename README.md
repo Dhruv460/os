@@ -1,5 +1,7 @@
 ## Overview
 
+[![Demo](demo.gif)](./demo.mp4)
+
 FreeRTOS offers feature stability with long term support (LTS) releases. FreeRTOS LTS libraries come with security updates and critical bug fixes to the FreeRTOS kernel and IoT libraries listed below for two years, and are maintained by AWS for the benefit of the FreeRTOS community. With FreeRTOS LTS, you get a complete set of libraries needed to build secure connected IoT and embedded products. Long term support helps reduce maintenance and testing costs associated with updating libraries on your devices already in production.
 
 AWS also offers FreeRTOS Extended Maintenance Plan (EMP) that provides you with security patches and critical bug fixes on your chosen FreeRTOS LTS version for up to an additional 10 years. With FreeRTOS EMP, your FreeRTOS-based long-lived devices can rely on a version that has feature stability and receives security updates for years. You receive timely notification of upcoming patches on FreeRTOS libraries, so you can plan the deployment of security patches on your IoT devices. To learn more about FreeRTOS EMP, see the [FreeRTOS Features page](https://aws.amazon.com/freertos/features/).
@@ -52,11 +54,11 @@ This library is licensed under the MIT License. See the [LICENSE](LICENSE.md) fi
 
 what we did :
 
-we implemented edf (earliest deadline first sheduling algorithm) to customise sheduling for our RTOS 
+we implemented edf (earliest deadline first sheduling algorithm) to customise sheduling for our RTOS
 
 1. Task Scheduling (EDF + Priority)
-Concept:
-The scheduler combines Earliest Deadline First (EDF) and priority-based scheduling.
+   Concept:
+   The scheduler combines Earliest Deadline First (EDF) and priority-based scheduling.
 
 Implementation:
 
@@ -77,8 +79,8 @@ It selects the front of the queue to run.
 This task executes for one time unit (remainingTime--), and if done, it's marked completed.
 
 2. IPC Queue (Indirect)
-Concept:
-The vector taskList acts like an IPC queue. Multiple threads access it:
+   Concept:
+   The vector taskList acts like an IPC queue. Multiple threads access it:
 
 simulateTaskInput() adds tasks (simulated user input).
 
@@ -92,8 +94,8 @@ No race conditions,
 Safe concurrent task addition and scheduling.
 
 3. IPC via Shared Memory (Simulated)
-Concept:
-shared_memory is a shared variable that simulates memory-mapped IPC.
+   Concept:
+   shared_memory is a shared variable that simulates memory-mapped IPC.
 
 Usage:
 
@@ -104,8 +106,8 @@ If no task is running, it sets shared_memory = -1.
 This shared variable represents which task is being processed, visible globally (to other threads or systems, if expanded).
 
 4. GUI with ncurses (Detailed)
-Concept:
-ncurses is a C/C++ terminal GUI library. It lets you build interactive CLI programs with windows, colors, input fields, etc.
+   Concept:
+   ncurses is a C/C++ terminal GUI library. It lets you build interactive CLI programs with windows, colors, input fields, etc.
 
 Used Windows:
 
@@ -115,15 +117,15 @@ Temporary popup windows for task input.
 
 Key GUI Elements:
 
-Element	Purpose
-box(win, 0, 0)	Draws a border around the window.
-mvwprintw(win, y, x, ...)	Prints text at a specific position inside the window.
-werase(win)	Clears the content of the window.
-wrefresh(win)	Updates the actual terminal with the changes.
-mvvgetnstr()	Reads user input from specific location.
-curs_set(0/1)	Hides/shows the cursor.
-'i' key	Opens an input window for dynamic task addition.
-'q' key	Exits the program.
+Element Purpose
+box(win, 0, 0) Draws a border around the window.
+mvwprintw(win, y, x, ...) Prints text at a specific position inside the window.
+werase(win) Clears the content of the window.
+wrefresh(win) Updates the actual terminal with the changes.
+mvvgetnstr() Reads user input from specific location.
+curs_set(0/1) Hides/shows the cursor.
+'i' key Opens an input window for dynamic task addition.
+'q' key Exits the program.
 Display Features:
 
 Header: Current time, running task, shared memory.
@@ -140,8 +142,7 @@ cpp
 Copy
 Edit
 mvwprintw(win, 1, 2, "EDF + Priority Scheduler | Time: %d", currentTime);
-mvwprintw(win, 3, 2, "Shared Memory (Task ID): %d", shared_memory);
-5. Summary of Features
+mvwprintw(win, 3, 2, "Shared Memory (Task ID): %d", shared_memory); 5. Summary of Features
 Manual + Auto Task Input: Combine user control with real-time simulation.
 
 Preemptive Simulation: Tasks run 1-second ticks, mimicking real CPUs.
