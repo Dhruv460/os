@@ -1,5 +1,6 @@
 ## Demo
-![Watch the demo](demo.gif)
+
+👉 [Click to view the demo GIF](./demo.gif)
 
 ## Overview
 
