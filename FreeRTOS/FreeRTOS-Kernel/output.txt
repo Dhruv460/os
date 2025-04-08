@@ -1,0 +1,7 @@
+Enter the number of tasks: Enter arrival time for Task 1: Enter execution time for Task 1: Enter deadline for Task 1: Enter arrival time for Task 2: Enter execution time for Task 2: Enter deadline for Task 2: Enter arrival time for Task 3: Enter execution time for Task 3: Enter deadline for Task 3: 
+Execution Order:
+Time 3: Task 2 (Arrival: 3, Execution: 2, Deadline: 5)
+Time 5: Task 1 (Arrival: 1, Execution: 3, Deadline: 6)
+Task 1 missed its deadline.
+Time 8: Task 3 (Arrival: 4, Execution: 4, Deadline: 10)
+Task 3 missed its deadline.
